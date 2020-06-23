@@ -12,20 +12,7 @@ import javax.xml.bind.DatatypeConverter;
  * @author Sajana
  */
 public class Encryption {
-    public static void main(String[] args) {
-        String encrypted,decrypted;
-        String str = "Hello world fuck off 1965232 @@@@ im sajana";
-        // encode data using BASE64
-        Encryption enc = new Encryption();
-        try {
-             encrypted=enc.encrypt(str);
-             System.out.println(encrypted);
-             decrypted=enc.decrypt(encrypted);
-             System.out.println(decrypted);
-        } catch (Exception e) {
-        }
-       
-    }
+   
     public String encrypt(String text)throws Exception{
     String encoded = DatatypeConverter.printBase64Binary(text.getBytes());
         
