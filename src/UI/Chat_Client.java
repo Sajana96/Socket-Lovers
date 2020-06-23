@@ -6,8 +6,6 @@
 package UI;
 
 import Encryption.Encryption;
-import static UI.Chat_Server.din;
-import static UI.Chat_Server.s;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.net.Socket;
@@ -17,7 +15,10 @@ import java.net.Socket;
  * @author Malmi
  */
 public class Chat_Client extends javax.swing.JFrame {
-
+    
+    static Socket s;
+    static DataInputStream din;
+    static DataOutputStream dout;
     /**
      * Creates new form Chat_Client
      */
@@ -34,21 +35,81 @@ public class Chat_Client extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jLabel1 = new javax.swing.JLabel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        msgTextArea = new javax.swing.JTextArea();
+        txtClientMsg = new javax.swing.JTextField();
+        btnClientSend = new javax.swing.JButton();
+
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+
+        jLabel1.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        jLabel1.setText("Client");
+
+        msgTextArea.setEditable(false);
+        msgTextArea.setColumns(20);
+        msgTextArea.setRows(5);
+        jScrollPane1.setViewportView(msgTextArea);
+
+        btnClientSend.setText("Send");
+        btnClientSend.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnClientSendActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(165, 165, 165)
+                        .addComponent(jLabel1))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(19, 19, 19)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(txtClientMsg, javax.swing.GroupLayout.PREFERRED_SIZE, 255, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addComponent(btnClientSend, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 363, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addContainerGap(18, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 177, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(14, 14, 14)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(txtClientMsg, javax.swing.GroupLayout.DEFAULT_SIZE, 61, Short.MAX_VALUE)
+                    .addComponent(btnClientSend, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap())
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void btnClientSendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClientSendActionPerformed
+        String msgout="";
+        if(!txtClientMsg.getText().isEmpty()){
+            msgout = txtClientMsg.getText().trim();
+            Encryption enc = new Encryption();
+            try {
+                System.out.println("Encrypted message out: "+enc.encrypt(msgout));
+                dout.writeUTF(enc.encrypt(msgout));
+                msgTextArea.setText(msgTextArea.getText().trim()+"\nClient:  "+msgout);
+                txtClientMsg.setText("");
+            } catch (Exception e) {
+
+            }
+        }
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnClientSendActionPerformed
 
     /**
      * @param args the command line arguments
@@ -97,8 +158,13 @@ public class Chat_Client extends javax.swing.JFrame {
             }
         } catch (Exception e) {
         }
-    }
+    }    
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnClientSend;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JScrollPane jScrollPane1;
+    private static javax.swing.JTextArea msgTextArea;
+    private javax.swing.JTextField txtClientMsg;
     // End of variables declaration//GEN-END:variables
 }
