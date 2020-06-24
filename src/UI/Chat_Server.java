@@ -141,20 +141,15 @@ public class Chat_Server extends javax.swing.JFrame {
 
     private void btnServerSendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnServerSendActionPerformed
             
-        SocketServer server = new SocketServer();
-        try {
-            server.startServer();
-        } catch (IOException ex) {
-            Logger.getLogger(Chat_Server.class.getName()).log(Level.SEVERE, null, ex);
-        }
+       
         String msgout="";
             if(!txtServerMsg.getText().isEmpty()){
              msgout = txtServerMsg.getText().trim();
                try {
                    Encryption enc = new Encryption();
                    System.out.println("Encrypted message out: "+enc.encrypt(msgout));
-                   server.sendMessage((enc.encrypt(msgout)));
-            //dout.writeUTF(enc.encrypt(msgout));
+                   
+            dout.writeUTF(enc.encrypt(msgout));
             
             msgTextArea.setText(msgTextArea.getText().trim()+"\nServer:  "+msgout);
             txtServerMsg.setText("");
@@ -181,17 +176,16 @@ public class Chat_Server extends javax.swing.JFrame {
         String msgin="";
        
         try {
-            /*ss = new ServerSocket(3700);
+            ss = new ServerSocket(3700);
             s = ss.accept();
             lblConnectedClient.setText("Client Connected");
             
             din = new  DataInputStream((s.getInputStream()));
-            dout = new DataOutputStream(s.getOutputStream());*/
-            SocketServer server = new SocketServer();
-            server.startServer();
+            dout = new DataOutputStream(s.getOutputStream());
+            
             Encryption enc = new Encryption();
             while(true){
-            msgin = server.recieveMessage();
+            msgin = din.readUTF();
                 System.out.println("Encrypted message in "+msgin);
             msgTextArea.setText(msgTextArea.getText().trim()+"\nClient:  "+enc.decrypt(msgin));
             
