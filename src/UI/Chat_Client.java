@@ -8,7 +8,11 @@ package UI;
 import Encryption.Encryption;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.IOException;
 import java.net.Socket;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import socketlovers.SocketClient;
 
 /**
  *
@@ -123,13 +127,23 @@ public class Chat_Client extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnClientSendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClientSendActionPerformed
+        
+        SocketClient client = new SocketClient();
+        try {
+            client.connect();
+        } catch (IOException ex) {
+            Logger.getLogger(Chat_Client.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
         String msgout="";
         if(!txtClientMsg.getText().isEmpty()){
             msgout = txtClientMsg.getText().trim();
             Encryption enc = new Encryption();
             try {
                 System.out.println("Encrypted message out: "+enc.encrypt(msgout));
-                dout.writeUTF(enc.encrypt(msgout));
+                client.sendMessage((enc.encrypt(msgout)));
+                //dout.writeUTF(enc.encrypt(msgout));
+                
                 msgTextArea.setText(msgTextArea.getText().trim()+"\nClient:  "+msgout);
                 txtClientMsg.setText("");
             } catch (Exception e) {
@@ -143,29 +157,8 @@ public class Chat_Client extends javax.swing.JFrame {
      * @param args the command line arguments
      */
     public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(Chat_Client.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(Chat_Client.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(Chat_Client.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(Chat_Client.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-
+     
+        
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
@@ -173,14 +166,16 @@ public class Chat_Client extends javax.swing.JFrame {
             }
         });
         try {
-            s = new Socket("127.0.0.1",3700);
+            SocketClient client = new SocketClient();
+            client.connect();
+            /*s = new Socket("127.0.0.1",3700);
             din = new DataInputStream(s.getInputStream());
-            dout = new DataOutputStream(s.getOutputStream());
+            dout = new DataOutputStream(s.getOutputStream());*/
             
             Encryption enc = new Encryption();
             String msgin = "";
             while(true){
-                msgin = din.readUTF();
+                msgin = client.recieveMessage();
                 System.out.println("Encrypted message in: "+msgin);
             msgTextArea.setText(msgTextArea.getText().trim()+"\nServer:  "+enc.decrypt(msgin));
             }

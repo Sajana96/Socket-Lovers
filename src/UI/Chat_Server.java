@@ -14,6 +14,7 @@ import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JLabel;
+import socketlovers.SocketServer;
 
 /**
  *
@@ -139,13 +140,21 @@ public class Chat_Server extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnServerSendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnServerSendActionPerformed
-            String msgout="";
+            
+        SocketServer server = new SocketServer();
+        try {
+            server.startServer();
+        } catch (IOException ex) {
+            Logger.getLogger(Chat_Server.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        String msgout="";
             if(!txtServerMsg.getText().isEmpty()){
              msgout = txtServerMsg.getText().trim();
                try {
                    Encryption enc = new Encryption();
                    System.out.println("Encrypted message out: "+enc.encrypt(msgout));
-            dout.writeUTF(enc.encrypt(msgout));
+                   server.sendMessage((enc.encrypt(msgout)));
+            //dout.writeUTF(enc.encrypt(msgout));
             
             msgTextArea.setText(msgTextArea.getText().trim()+"\nServer:  "+msgout);
             txtServerMsg.setText("");
@@ -161,29 +170,7 @@ public class Chat_Server extends javax.swing.JFrame {
     /**
      * @param args the command line arguments
      */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(Chat_Server.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(Chat_Server.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(Chat_Server.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(Chat_Server.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
+    public static void main(String args[]) { 
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
@@ -194,18 +181,17 @@ public class Chat_Server extends javax.swing.JFrame {
         String msgin="";
        
         try {
-            ss = new ServerSocket(3700);
+            /*ss = new ServerSocket(3700);
             s = ss.accept();
             lblConnectedClient.setText("Client Connected");
             
             din = new  DataInputStream((s.getInputStream()));
-            dout = new DataOutputStream(s.getOutputStream());
+            dout = new DataOutputStream(s.getOutputStream());*/
+            SocketServer server = new SocketServer();
+            server.startServer();
             Encryption enc = new Encryption();
             while(true){
-                if(s.isClosed()){
-            lblConnectedClient.setText("Client Disconnected");
-            }
-            msgin = din.readUTF();
+            msgin = server.recieveMessage();
                 System.out.println("Encrypted message in "+msgin);
             msgTextArea.setText(msgTextArea.getText().trim()+"\nClient:  "+enc.decrypt(msgin));
             
